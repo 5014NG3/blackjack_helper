@@ -3,15 +3,12 @@ let dmnds = "_of_diamonds.png"
 let hearts = "_of_hearts.png"
 let spades = "_of_spades.png"
 let shoe
-//need to have this be a list of list to account for multiple hands ie splits
-//re-implement this using stack
-
-//player is now a stack
 let player = []
 let dealer = []
 let player_turn_over = false
+let hand_num = 1
+let player_hand_totals = []
 
-//for splitting
 
 const repeatArray = (arr, n) => Array.from({ length: n }, () => arr).flat();
 const faces = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
@@ -71,12 +68,21 @@ function createDeck(shoe_size){
 function hit(){
     if (!player_turn_over){
 
-        player[player.length-1].push(shoe.pop())
+        var cur_card_pull = shoe.pop()
+
+        player[player.length-1].push(cur_card_pull)
+        displayCard(cur_card_pull, "player_hand_1")
         console.log(player[player.length-1])
         cur_total = getHandTotal(player[player.length-1])
         if (cur_total > 21){
-            console.log("bust within the hit func")
+            console.log("bust: ", cur_total )
             stand()
+            return
+        }
+        if (cur_total === 21){
+            console.log("force stand due to 21")
+            stand()
+            return
         }
 
     }
@@ -130,16 +136,28 @@ function dealCards(){
     player = []
     dealer = []
     player_turn_over = false
+    player_hand_totals = []
+    clearCardsDisplayed("dealer")
+    clearCardsDisplayed("player_hand_1")
     
     //animate this
     player.push([shoe.pop()])
+    displayCard(player[player.length - 1][0], "player_hand_1")
+
     dealer.push(shoe.pop())
+    displayCard(dealer[0],"dealer")
+
     player[player.length - 1].push(shoe.pop())
     //hide this card on frontend
     dealer.push(shoe.pop())
-    console.log("player: ", player[player.length - 1][0], player[player.length - 1][1])
-    console.log("dealer: ", dealer[0], "hole")
-    getHandTotal(player[player.length - 1])
+    displayCard(player[player.length - 1][1], "player_hand_1")
+
+
+    var player_total = getHandTotal(player[player.length - 1])
+
+    //is dealer card that is showing is 10, then all players lose if they have an ace
+
+    var dealer_total  = getHandTotal(dealer)
 }
 
 ``
@@ -148,7 +166,7 @@ function stand(){
 
     if (!player_turn_over){
         console.log("stand")
-        player.pop()
+        player_hand_totals.push(getHandTotal(player.pop()))
         checkPlayerEnd()
     }
 }
@@ -159,6 +177,7 @@ function checkPlayerEnd(){
     if (player.length === 0){
         player_turn_over = true
         showDealerHand()
+        return 
     }
     if (player[player.length-1].length === 1){
         //need to draw a card for the pair ting
@@ -173,10 +192,10 @@ function checkPlayerEnd(){
 
 function double(){
     if (!player_turn_over){
-        player[player.length-1].push(shoe.pop())
-        console.log(player[player.length-1])
-        getHandTotal(player[player.length-1])
-        //force stand
+        var player_card = shoe.pop()
+        player[player.length-1].push(player_card)
+        displayCard(player_card, "player_hand_1")
+
         stand()
     }
 
@@ -221,22 +240,61 @@ function surrender(){
 
 function showDealerHand(){
 
-    console.log("DEALER: ")
+
     let dealer_total = getHandTotal(dealer)
-    console.log(dealer[0], dealer[1], dealer_total)
 
     while (dealer_total <= 16){
-        dealer.push(shoe.pop())
+        var dealer_card = shoe.pop()
+        dealer.push(dealer_card)
+        displayCard(dealer_card, "dealer")
+
         dealer_total = getHandTotal(dealer)
-        console.log(dealer_total)
     }
 
 
-    console.log("end of round")
-    //check dealer total against players
+
+
+
+    if (player_hand_totals[0] <= 21){
+        if (dealer_total > 21 || player_hand_totals[0] > dealer_total){
+            displayOutcome("WIN", 1)
+        }
+        else if (player_hand_totals[0] < dealer_total){
+            displayOutcome("LOSE", 1)
+        }
+        else{
+            displayOutcome("PUSH", 1)
+        }
+    }
+    else{
+        displayOutcome("BUST", 1)
+    }
+
 
 }
 
 
 
+function displayCard(hand,player_type){
+    var div = document.getElementById(player_type);
+    var cur_card = hand[0] + " , " + hand[1] + " " 
+    var textNode = document.createTextNode(cur_card);
+    div.appendChild(textNode);
+}
+
+function displayOutcome(outcome, hand_num){
+    var outcome_id = "player_hand_" + hand_num.toString() + "_outcome"
+    var div = document.getElementById(outcome_id);
+    var textNode = document.createTextNode(outcome);
+    div.appendChild(textNode);  
+}
+
+
+function clearCardsDisplayed(player_type){
+    var div = document.getElementById(player_type);
+    while (div.firstChild) {
+        div.removeChild(div.firstChild);
+    }
+
+}
 
