@@ -139,6 +139,8 @@ function dealCards(){
     player_hand_totals = []
     clearCardsDisplayed("dealer")
     clearCardsDisplayed("player_hand_1")
+    clearCardsDisplayed("player_hand_1_outcome")
+
     
     //animate this
     player.push([shoe.pop()])
@@ -195,8 +197,8 @@ function double(){
         var player_card = shoe.pop()
         player[player.length-1].push(player_card)
         displayCard(player_card, "player_hand_1")
-
         stand()
+
     }
 
 
@@ -234,7 +236,6 @@ function surrender(){
     if (!player_turn_over){
         console.log("surrender")
         stand()
-        checkPlayerEnd()
     }
 }
 
@@ -242,6 +243,7 @@ function showDealerHand(){
 
 
     let dealer_total = getHandTotal(dealer)
+    displayCard(dealer[1], "dealer")
 
     while (dealer_total <= 16){
         var dealer_card = shoe.pop()
