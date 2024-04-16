@@ -12,13 +12,15 @@
   </head>
   <body>
 
-    <button onclick = "createDeck(4)" > create shoe </button>
-    <button onclick="dealCards()"> deal </button>
-    <button onclick = "hit()" > hit </button>
-    <button onclick = "stand()" > stand </button>
-    <button onclick = "double()" > double </button>
-    <button onclick = "split()" > split </button>
-    <button onclick = "surrender()" > surrender </button>
+    <button id = "createshoe" onclick = "createDeck(4)" > create shoe </button>
+    <button id = "deal" onclick="dealCards()"> deal </button>
+    <button id = "hit" onclick = "hit()" > hit </button>
+    <button id = "stand" onclick = "stand()" > stand </button>
+    <button id = "double" onclick = "double()" > double </button>
+    <button id = "split" onclick = "split()" > split </button>
+    <button id = "surrender" onclick = "surrender()" > surrender </button>
+    <button id = "insurance" onclick = "" > insurance </button>
+
 
     <h1>Dealer</h1>
     <div id = "dealer">
@@ -32,12 +34,18 @@
 
     <h1>Player 2nd</h1>
     <div id = "player_hand_2"></div>
+    <div id = "player_hand_2_outcome"></div>
+
 
     <h1>Player 3rd</h1>
     <div id = "player_hand_3"></div>
+    <div id = "player_hand_3_outcome"></div>
+
 
     <h1>Player 4th</h1>
     <div id = "player_hand_4"></div>
+    <div id = "player_hand_4_outcome"></div>
+
 
 
 

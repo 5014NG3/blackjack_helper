@@ -29,6 +29,7 @@ const cardValue = {
     'ace': 11
 
 };
+const max_splits = 4
 
 function shuffle(array) {
     let currentIndex = array.length
@@ -71,7 +72,7 @@ function hit(){
         var cur_card_pull = shoe.pop()
 
         player[player.length-1].push(cur_card_pull)
-        displayCard(cur_card_pull, "player_hand_1")
+        displayCard(cur_card_pull, getHandID(hand_num))
         console.log(player[player.length-1])
         cur_total = getHandTotal(player[player.length-1])
         if (cur_total > 21){
@@ -126,9 +127,32 @@ function getHandTotal(player){
     }
 
     return soft_total
-
-
     
+}
+
+
+function clearTable(){
+    clearCardsDisplayed("dealer")
+    for (let i = 0; i < max_splits; i++) {
+        let player_hand = "player_hand_" + (i+1).toString()
+        clearCardsDisplayed(player_hand)
+        clearCardsDisplayed(player_hand + "_outcome")
+
+    }
+}
+
+function getHandID(hand_num){
+    return "player_hand_" + (hand_num).toString()
+}
+
+function pairCheck(){
+    if (player[player.length - 1][0][0] === player[player.length - 1][1][0]){
+        document.getElementById("split").disabled=false
+    }
+    else{
+        document.getElementById("split").disabled=true
+    }
+
 }
 
 function dealCards(){
@@ -137,14 +161,15 @@ function dealCards(){
     dealer = []
     player_turn_over = false
     player_hand_totals = []
-    clearCardsDisplayed("dealer")
-    clearCardsDisplayed("player_hand_1")
-    clearCardsDisplayed("player_hand_1_outcome")
+    hand_num = 1
+    document.getElementById("split").disabled=true
+    document.getElementById("insurance").disabled=true
 
-    
+    clearTable()
+
     //animate this
     player.push([shoe.pop()])
-    displayCard(player[player.length - 1][0], "player_hand_1")
+    displayCard(player[player.length - 1][0], getHandID(hand_num))
 
     dealer.push(shoe.pop())
     displayCard(dealer[0],"dealer")
@@ -152,22 +177,29 @@ function dealCards(){
     player[player.length - 1].push(shoe.pop())
     //hide this card on frontend
     dealer.push(shoe.pop())
-    displayCard(player[player.length - 1][1], "player_hand_1")
+    displayCard(player[player.length - 1][1],getHandID(hand_num))
+
+    pairCheck()
 
 
     var player_total = getHandTotal(player[player.length - 1])
 
-    //is dealer card that is showing is 10, then all players lose if they have an ace
+    if (player_total === 21){
+        stand()
+    }
 
     var dealer_total  = getHandTotal(dealer)
+    if (cardValue[dealer[0][0]] === 10 && dealer_total === 21 ){
+        stand()
+    }
 }
 
-``
+
 
 function stand(){
 
     if (!player_turn_over){
-        console.log("stand")
+        //locking in the stand value of the player hand
         player_hand_totals.push(getHandTotal(player.pop()))
         checkPlayerEnd()
     }
@@ -181,12 +213,20 @@ function checkPlayerEnd(){
         showDealerHand()
         return 
     }
+
     if (player[player.length-1].length === 1){
         //need to draw a card for the pair ting
-        console.log("gave card to the other pair hand")
-        player[player.length-1].push(shoe.pop())
-        console.log(player[player.length-1])
+        hand_num += 1
+        let first_hand_card = player[player.length-1][0]
+        let hand_id = getHandID(hand_num)
+        displayCard(first_hand_card,hand_id)
 
+
+        console.log("gave card to the other pair hand")
+        let second_hand_card =  shoe.pop()
+        player[player.length-1].push(second_hand_card)
+        pairCheck()
+        displayCard(second_hand_card,hand_id)
     }
 
 }
@@ -196,15 +236,12 @@ function double(){
     if (!player_turn_over){
         var player_card = shoe.pop()
         player[player.length-1].push(player_card)
-        displayCard(player_card, "player_hand_1")
+        displayCard(player_card, getHandID(hand_num))
         stand()
-
     }
-
-
-
-
 }
+
+//3 people, last one scanning, second one scanning, 
 
 function split(){
     if (!player_turn_over){
@@ -214,14 +251,20 @@ function split(){
         let second_card = player[player.length-1][1]
 
         if (first_card[0] === second_card[0]){
+            let hand_id_one = getHandID(hand_num)
+            clearCardsDisplayed(hand_id_one)
+            displayCard(first_card,hand_id_one)
+
             //since using stack push the second card first, so the first is on top
             //remove the pair from stack
             player.pop()
             //put to the front to preserve order
             player.unshift([second_card])
+            let hand_second_card =  shoe.pop()
 
-            player.push([first_card, shoe.pop()])
-            console.log("first split hand: ", player[player.length-1])
+            player.push([first_card, hand_second_card])
+            pairCheck()
+            displayCard(hand_second_card,hand_id_one)
             getHandTotal(player[player.length-1])
             
 
@@ -239,6 +282,10 @@ function surrender(){
     }
 }
 
+function insurance(){
+
+}
+
 function showDealerHand(){
 
 
@@ -254,22 +301,24 @@ function showDealerHand(){
     }
 
 
+    for (let i = 0; i < max_splits; i++) {
+    
 
 
-
-    if (player_hand_totals[0] <= 21){
-        if (dealer_total > 21 || player_hand_totals[0] > dealer_total){
-            displayOutcome("WIN", 1)
-        }
-        else if (player_hand_totals[0] < dealer_total){
-            displayOutcome("LOSE", 1)
+        if (player_hand_totals[i] <= 21){
+            if (dealer_total > 21 || player_hand_totals[i] > dealer_total){
+                displayOutcome("WIN", i+1)
+            }
+            else if (player_hand_totals[i] < dealer_total){
+                displayOutcome("LOSE", i+1)
+            }
+            else{
+                displayOutcome("PUSH", i+1)
+            }
         }
         else{
-            displayOutcome("PUSH", 1)
+            displayOutcome("BUST", i+1)
         }
-    }
-    else{
-        displayOutcome("BUST", 1)
     }
 
 
