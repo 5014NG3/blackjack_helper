@@ -9,6 +9,9 @@ let player_turn_over = false
 let hand_num = 1
 let player_hand_totals = []
 let split_count = 0
+let track_split_order = []
+
+
 
 const repeatArray = (arr, n) => Array.from({ length: n }, () => arr).flat();
 const faces = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
@@ -216,13 +219,24 @@ function stand(){
 
 function checkPlayerEnd(){
 
-    if (player.length === 0){
+    if (player.length === 0 && track_split_order.length === 0){
         player_turn_over = true
         showDealerHand()
         return 
     }
 
+
+    if (player.length === 0 && track_split_order.length !== 0){
+        player = track_split_order
+        //empty split order stack
+        track_split_order = []
+    }
+
     //check for pending cards pulled from splitting
+
+
+
+
     if (player[player.length-1].length === 1){
 
         //need to draw a card for the pair ting
@@ -269,12 +283,15 @@ function split(){
             //since using stack push the second card first, so the first is on top
             //remove the pair from stack
             player.pop()
-            //put to the front to preserve order
-            player.unshift([second_card])
+
+            //user other array to store the splits
+            track_split_order.push([second_card])
+            console.log("tracking: ", track_split_order)
 
             let hand_second_card =  shoe.pop()
 
             player.push([first_card, hand_second_card])
+            console.log(player)
             pairCheck()
             displayCard(hand_second_card,hand_id_one)
             getHandTotal(player[player.length-1])
