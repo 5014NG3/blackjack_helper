@@ -8,7 +8,7 @@ let dealer = []
 let player_turn_over = false
 let hand_num = 1
 let player_hand_totals = []
-
+let split_count = 0
 
 const repeatArray = (arr, n) => Array.from({ length: n }, () => arr).flat();
 const faces = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
@@ -63,8 +63,15 @@ function createDeck(shoe_size){
     }
 
     shoe = shuffle(repeatArray(single_shoe, shoe_size));
+    //testing splitting
+
+    for (let i = 0; i < 20; i++) {
+        shoe.push(["6","'" + i.toString() + "'"])
+    }
 
 }
+
+//for every split shift down
 
 function hit(){
     if (!player_turn_over){
@@ -164,6 +171,7 @@ function dealCards(){
     hand_num = 1
     document.getElementById("split").disabled=true
     document.getElementById("insurance").disabled=true
+    
 
     clearTable()
 
@@ -214,19 +222,22 @@ function checkPlayerEnd(){
         return 
     }
 
+    //check for pending cards pulled from splitting
     if (player[player.length-1].length === 1){
+
         //need to draw a card for the pair ting
         hand_num += 1
         let first_hand_card = player[player.length-1][0]
         let hand_id = getHandID(hand_num)
         displayCard(first_hand_card,hand_id)
 
-
         console.log("gave card to the other pair hand")
         let second_hand_card =  shoe.pop()
         player[player.length-1].push(second_hand_card)
         pairCheck()
         displayCard(second_hand_card,hand_id)
+        
+
     }
 
 }
@@ -260,6 +271,7 @@ function split(){
             player.pop()
             //put to the front to preserve order
             player.unshift([second_card])
+
             let hand_second_card =  shoe.pop()
 
             player.push([first_card, hand_second_card])
