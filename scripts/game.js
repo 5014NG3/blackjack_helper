@@ -8,7 +8,6 @@ let dealer = []
 let player_turn_over = false
 let hand_num = 1
 let player_hand_totals = []
-let split_count = 0
 let track_split_order = []
 
 
@@ -83,15 +82,12 @@ function hit(){
 
         player[player.length-1].push(cur_card_pull)
         displayCard(cur_card_pull, getHandID(hand_num))
-        console.log(player[player.length-1])
         cur_total = getHandTotal(player[player.length-1])
         if (cur_total > 21){
-            console.log("bust: ", cur_total )
             stand()
             return
         }
         if (cur_total === 21){
-            console.log("force stand due to 21")
             stand()
             return
         }
@@ -228,14 +224,8 @@ function checkPlayerEnd(){
 
     if (player.length === 0 && track_split_order.length !== 0){
         player = track_split_order
-        //empty split order stack
         track_split_order = []
     }
-
-    //check for pending cards pulled from splitting
-
-
-
 
     if (player[player.length-1].length === 1){
 
@@ -245,7 +235,6 @@ function checkPlayerEnd(){
         let hand_id = getHandID(hand_num)
         displayCard(first_hand_card,hand_id)
 
-        console.log("gave card to the other pair hand")
         let second_hand_card =  shoe.pop()
         player[player.length-1].push(second_hand_card)
         pairCheck()
@@ -286,12 +275,10 @@ function split(){
 
             //user other array to store the splits
             track_split_order.push([second_card])
-            console.log("tracking: ", track_split_order)
 
             let hand_second_card =  shoe.pop()
 
             player.push([first_card, hand_second_card])
-            console.log(player)
             pairCheck()
             displayCard(hand_second_card,hand_id_one)
             getHandTotal(player[player.length-1])
