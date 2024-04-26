@@ -1,14 +1,16 @@
 let shoe
+let player
+let dealer
+let player_hand_totals
+let track_split_order
+let player_turn_over = false
+let hand_num
+let split_count
 let clubs = "_of_clubs.png"
 let dmnds = "_of_diamonds.png"
 let hearts = "_of_hearts.png"
 let spades = "_of_spades.png"
-let player = []
-let dealer = []
-let player_hand_totals = []
-let track_split_order = []
-let player_turn_over = false
-let hand_num = 1
+
 
 
 const repeatArray = (arr, n) => Array.from({ length: n }, () => arr).flat();
@@ -64,7 +66,9 @@ function createDeck(shoe_size){
     }
 
     shoe = shuffle(repeatArray(single_shoe, shoe_size));
-
+    for (let i = 0; i < 20; i++) {
+        shoe.push(["6","'" + i.toString() + "'"])
+    }
 }
 
 //for every split shift down
@@ -152,7 +156,7 @@ function getHandID(hand_num){
 }
 
 function pairCheck(){
-    if (player[player.length - 1][0][0] === player[player.length - 1][1][0]){
+    if (split_count+1 !== max_splits && player[player.length - 1][0][0] === player[player.length - 1][1][0]){
         document.getElementById("split").disabled=false
     }
     else{
@@ -169,6 +173,7 @@ function dealCards(){
     track_split_order = []
     player_turn_over = false
     hand_num = 1
+    split_count = 0
     document.getElementById("split").disabled=true
     document.getElementById("insurance").disabled=true
     
@@ -275,12 +280,18 @@ function showSplitCards(start,end,track_split_order){
 }
 
 
+
 function split(){
-    if (!player_turn_over){
+    if (!player_turn_over && split_count+1 !== max_splits){
+
+
         let first_card = player[player.length-1][0]
         let second_card = player[player.length-1][1]
 
         if (first_card[0] === second_card[0]){
+
+            split_count += 1
+
             let hand_id_one = getHandID(hand_num)
             clearCardsDisplayed(hand_id_one)
             displayCard(first_card,hand_id_one)
@@ -310,6 +321,7 @@ function split(){
 
     
     }
+
 }
 
 function surrender(){
