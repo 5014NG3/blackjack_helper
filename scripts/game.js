@@ -1,15 +1,14 @@
+let shoe
 let clubs = "_of_clubs.png"
 let dmnds = "_of_diamonds.png"
 let hearts = "_of_hearts.png"
 let spades = "_of_spades.png"
-let shoe
 let player = []
 let dealer = []
-let player_turn_over = false
-let hand_num = 1
 let player_hand_totals = []
 let track_split_order = []
-
+let player_turn_over = false
+let hand_num = 1
 
 
 const repeatArray = (arr, n) => Array.from({ length: n }, () => arr).flat();
@@ -165,8 +164,9 @@ function dealCards(){
     //the initial dealing
     player = []
     dealer = []
-    player_turn_over = false
     player_hand_totals = []
+    track_split_order = []
+    player_turn_over = false
     hand_num = 1
     document.getElementById("split").disabled=true
     document.getElementById("insurance").disabled=true
@@ -215,17 +215,21 @@ function stand(){
 
 function checkPlayerEnd(){
 
-    if (player.length === 0 && track_split_order.length === 0){
-        player_turn_over = true
-        showDealerHand()
-        return 
+    if (player.length === 0){
+
+        if (track_split_order.length === 0){
+            player_turn_over = true
+            showDealerHand()
+            return 
+        }
+    
+    
+        if (track_split_order.length !== 0){
+            player = track_split_order
+            track_split_order = []
+        }
     }
 
-
-    if (player.length === 0 && track_split_order.length !== 0){
-        player = track_split_order
-        track_split_order = []
-    }
 
     if (player[player.length-1].length === 1){
 
@@ -255,12 +259,9 @@ function double(){
     }
 }
 
-//3 people, last one scanning, second one scanning, 
 
 function split(){
     if (!player_turn_over){
-        // (A, A) -> (A,A) , (A,?) -> (A,A), (A,?), (A,?)
-        //  [0]  -> [1,0] -> 
         let first_card = player[player.length-1][0]
         let second_card = player[player.length-1][1]
 
@@ -269,12 +270,13 @@ function split(){
             clearCardsDisplayed(hand_id_one)
             displayCard(first_card,hand_id_one)
 
-            //since using stack push the second card first, so the first is on top
-            //remove the pair from stack
             player.pop()
 
             //user other array to store the splits
             track_split_order.push([second_card])
+            console.log("fill from: ", hand_num, " to :", hand_num + track_split_order.length)
+
+            //display shit hurrr
 
             let hand_second_card =  shoe.pop()
 
