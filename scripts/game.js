@@ -64,11 +64,6 @@ function createDeck(shoe_size){
     }
 
     shoe = shuffle(repeatArray(single_shoe, shoe_size));
-    //testing splitting
-
-    for (let i = 0; i < 20; i++) {
-        shoe.push(["6","'" + i.toString() + "'"])
-    }
 
 }
 
@@ -231,8 +226,6 @@ function checkPlayerEnd(){
     
     
         if (track_split_order.length !== 0){
-            console.log("a fill from: ", hand_num+1, " to :", hand_num + track_split_order.length)
-            console.log(track_split_order)
 
             player = track_split_order
             track_split_order = []
