@@ -243,6 +243,8 @@ function checkPlayerEnd(){
     if (player[player.length-1].length === 1){
 
         //need to draw a card for the pair ting
+        clearHands(hand_num,hand_num+1)
+
         hand_num += 1
         let first_hand_card = player[player.length-1][0]
         let hand_id = getHandID(hand_num)
@@ -268,7 +270,14 @@ function double(){
     }
 }
 
-function showSplitCards(start,end){
+function showSplitCards(start,end,track_split_order){
+    clearHands(start-1,end-1)
+    var count = track_split_order.length - 1
+    for (let i = start; i < end; i++) {
+        displayCard(track_split_order[count], getHandID(i))
+        count -= 1
+    }
+
 
 }
 
@@ -287,10 +296,13 @@ function split(){
 
             //user other array to store the splits
             track_split_order.push([second_card])
-            console.log("b fill from: ", hand_num+1, " to :", hand_num + track_split_order.length)
-            console.log(track_split_order)
+            if (player[0] && player[0].length === 1){
+                track_split_order.unshift(player.shift())
+            }
 
-            //display shit hurrr
+
+            showSplitCards(hand_num+1,hand_num + track_split_order.length+1,track_split_order)
+
 
             let hand_second_card =  shoe.pop()
 
@@ -360,7 +372,14 @@ function showDealerHand(){
 
 function displayCard(hand,player_type){
     var div = document.getElementById(player_type);
-    var cur_card = hand[0] + " , " + hand[1] + " " 
+
+
+    if (hand[1]){
+        var cur_card = hand[0] + " , " + hand[1] + " " 
+    }
+    else{
+        var cur_card = hand[0] 
+    }
     var textNode = document.createTextNode(cur_card);
     div.appendChild(textNode);
 }
