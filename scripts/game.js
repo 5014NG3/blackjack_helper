@@ -136,14 +136,20 @@ function getHandTotal(player){
 }
 
 
-function clearTable(){
-    clearCardsDisplayed("dealer")
-    for (let i = 0; i < max_splits; i++) {
+function clearHands(start,end){
+    for (let i = start; i < end; i++) {
         let player_hand = "player_hand_" + (i+1).toString()
         clearCardsDisplayed(player_hand)
         clearCardsDisplayed(player_hand + "_outcome")
 
     }
+}
+
+
+function clearTable(start,end){
+    clearCardsDisplayed("dealer")
+    clearHands(start,end)
+
 }
 
 function getHandID(hand_num){
@@ -172,7 +178,7 @@ function dealCards(){
     document.getElementById("insurance").disabled=true
     
 
-    clearTable()
+    clearTable(0,max_splits)
 
     //animate this
     player.push([shoe.pop()])
@@ -225,6 +231,9 @@ function checkPlayerEnd(){
     
     
         if (track_split_order.length !== 0){
+            console.log("a fill from: ", hand_num+1, " to :", hand_num + track_split_order.length)
+            console.log(track_split_order)
+
             player = track_split_order
             track_split_order = []
         }
@@ -259,6 +268,10 @@ function double(){
     }
 }
 
+function showSplitCards(start,end){
+
+}
+
 
 function split(){
     if (!player_turn_over){
@@ -274,7 +287,8 @@ function split(){
 
             //user other array to store the splits
             track_split_order.push([second_card])
-            console.log("fill from: ", hand_num, " to :", hand_num + track_split_order.length)
+            console.log("b fill from: ", hand_num+1, " to :", hand_num + track_split_order.length)
+            console.log(track_split_order)
 
             //display shit hurrr
 
